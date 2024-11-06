@@ -1,0 +1,63 @@
+<div class ="card">
+
+  <div class="card-body">
+
+    <h1 class="text-white ">{{pageTitle}}</h1>
+
+<div class="row">
+ 
+  <form action="/" method="get" class="col-12 col-sm-5 col-md-4"> 
+    <div class="input-group"> 
+      <input type="text" name="search" placeholder="Buscar pokemon" class="form-control" />
+      <button type="submit" class="btn btn-info">
+        <i class="bi bi-search"></i> Buscar
+        </button>
+    </div>
+  </form>
+
+  
+ <form action="/" method="get" class="col-12 col-sm-10 col-md-8"> 
+  <div class="input-group">
+    <select name="tipo" class="form-control">
+      <option selected value="">Todos los tipos</option>
+      {{#each tipos}}
+        <option value="{{this.nombre}}">{{this.nombre}}</option> 
+      {{/each}}
+    </select>
+    
+    <select name="region" class="form-control ms-2">
+      <option selected value="">Todas las regiones</option>
+      {{#each regiones}}
+        <option value="{{this.nombre}}">{{this.nombre}}</option> 
+      {{/each}}
+    </select>
+    
+    <button type="submit" class="btn btn-info ms-2">
+      <i class="bi bi-funnel"></i> Filtrar
+      </button>
+  </div>
+</form>
+
+
+
+</div>
+
+</div>
+
+</div>
+
+<div class="row">
+  {{#each pokemones}}
+    <div class="col-6 col-sm-4 col-md-2"> 
+      <div class="card mb-3">
+        <img src="{{this.imagen}}" class="card-img-top img-size" alt="{{this.nombre}}" />
+        <div class="card-body">
+          <h5 class="card-title text-muted text-center">{{this.nombre}}</h5>
+          <h6 class="card-subtitle mb-2 text-muted text-center">Tipo: {{this.tipoName}}</h6>  
+          <h6 class="card-subtitle mb-2 text-muted text-center">Región: {{this.regionName}}</h6>  
+        </div>
+      </div>
+    </div>  
+  {{/each}}
+</div>
+
