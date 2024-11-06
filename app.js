@@ -12,7 +12,7 @@ const pokemonRoute = require("./routes/pokemones");
 const regionRoute = require("./routes/regiones");
 const tipoRoute = require("./routes/tipos");
 const errorController = require("./controllers/errorController");
-
+const PORT = 3000;
 app.engine(
     "hbs",
     engine({
@@ -33,9 +33,7 @@ app.use("/pokemones", pokemonRoute);
 app.use("/regiones", regionRoute);
 app.use("/tipos", tipoRoute);
 
-app.use((req, res, next) => {
-    res.status(404).render("404", { pageTitle: "Page Not Found" });
-});
+app.use(errorController.Get404);
 
 Pokemon.associate({ Tipo, Region });
 Region.associate({ Pokemon });
@@ -44,7 +42,8 @@ Tipo.associate({ Pokemon });
 connection
     .sync()
     .then((result) => {
-        app.listen(3000);
+        console.log(`App is running on port ${PORT}`)
+        app.listen(PORT);
     })
     .catch((err) => {
         console.log(err);
