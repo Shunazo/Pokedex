@@ -2,75 +2,89 @@ const Pokemon = require("../models/pokemon");
 const Tipo = require("../models/tipo");
 const Region = require("../models/region");
 
-exports.pokemones = (req, res) => {
-  Pokemon.findAll({
-    include: [
-      { model: Tipo, as: 'tipo' },
-      { model: Region, as: 'region' }
-    ]
-  })
-  .then((pokemones) => {
-    
+exports.pokemones = async (req, res) => {
+  try {
+    const pokemones = await Pokemon.findAll({
+      include: [
+        { model: Tipo, as: 'tipo' },
+        { model: Region, as: 'region' }
+      ]
+    });
+
     const plainPokemones = pokemones.map(pokemon => pokemon.get({ plain: true }));
 
     res.render("pokemones/pokemones", {
       pageTitle: "Lista de Pokemones",
       pokemones: plainPokemones,
     });
-  })
-  .catch((err) => console.log(err));
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde."
+    });
+    console.log(err);
+  }
 };
 
+//form de creacion
+exports.createForm = async (req, res) => {
+  try {
+    const [tipos, regiones] = await Promise.all([
+      Tipo.findAll(),
+      Region.findAll(),
+    ]);
 
-exports.createForm = (req, res) => {
-  Promise.all([
-    Tipo.findAll(),
-    Region.findAll(),
-  ])
-  .then(([tipos, regiones]) => {
-   
     const plainTipos = tipos.map(tipo => tipo.get({ plain: true }));
     const plainRegiones = regiones.map(region => region.get({ plain: true }));
 
     res.render("pokemones/pokemones-create", {
-      pageTitle: "Crear Pokémon",
+      pageTitle: "Crear Pokemon",
       tipos: plainTipos,
       regiones: plainRegiones,
     });
-  })
-  .catch((err) => console.log(err));
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde."
+    });
+    console.log(err);
+  } 
+};
+  
+ //creacion en si 
+exports.create = async (req, res) => {
+  try {
+    const { nombre, imagen, tipoId, regionId } = req.body;
+
+    await Pokemon.create({
+      nombre,
+      imagen,
+      tipoId,  
+      regionId,  
+    });
+
+    res.redirect("/pokemones");
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde."
+    })
+  }
 };
 
+//form de edicion
+exports.editForm = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const [pokemon, tipos, regiones] = await Promise.all([
+      Pokemon.findByPk(id, { include: ['tipo', 'region'] }),
+      Tipo.findAll(),
+      Region.findAll(),
+    ]);
 
-exports.create = (req, res) => {
-  const { nombre, imagen, tipoId, regionId } = req.body;
-
-  Pokemon.create({
-    nombre,
-    imagen,
-    tipoId,  
-    regionId,  
-  })
-  .then(() => res.redirect("/pokemones"))
-  .catch((err) => console.log(err));
-};
-
-exports.editForm = (req, res) => {
-  const id = req.params.id;
-
-  Promise.all([
-    Pokemon.findByPk(id, { include: ['tipo', 'region'] }),
-    Tipo.findAll(),
-    Region.findAll(),
-  ])
-  .then(([pokemon, tipos, regiones]) => {
     if (!pokemon) return res.redirect("/pokemones");
 
     const plainPokemon = pokemon.get({ plain: true });
     const plainTipos = tipos.map(tipo => tipo.get({ plain: true }));
     const plainRegiones = regiones.map(region => region.get({ plain: true }));
 
-    
     plainTipos.forEach(tipo => {
       tipo.selected = tipo.id === plainPokemon.tipoId;
     });
@@ -80,38 +94,51 @@ exports.editForm = (req, res) => {
     });
 
     res.render("pokemones/pokemones-edit", {
-      pageTitle: "Editar Pokémon",
+      pageTitle: "Editar Pokemon",
       pokemon: plainPokemon,
       tipos: plainTipos,
       regiones: plainRegiones,
     });
-  })
-  .catch((err) => {
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde."
+    });
     console.log(err);
-    res.status(500).send("Error fetching data");
-  });
+  }
+};
+
+//edicion en si 
+exports.edit = async(req, res) => {
+  try{
+    const id = req.params.id;
+    const { nombre, imagen, tipoId, regionId } = req.body;
+
+    await Pokemon.update(
+      { nombre, imagen, tipoId, regionId },
+      { where: { id } }
+    );
+
+    res.redirect("/pokemones");
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde."
+    });
+    console.log(err);
+  }
 };
 
 
+//delete en si 
+exports.delete = async(req, res) => {
+  try{
+    const id = req.params.id;
 
-
-
-exports.edit = (req, res) => {
-  const id = req.params.id;
-  const { nombre, imagen, tipoId, regionId } = req.body;
-
-  Pokemon.update(
-    { nombre, imagen, tipoId, regionId },
-    { where: { id } }
-  )
-  .then(() => res.redirect("/pokemones"))
-  .catch((err) => console.log(err));
-};
-
-exports.delete = (req, res) => {
-  const id = req.params.id;
-
-  Pokemon.destroy({ where: { id } })
-  .then(() => res.redirect("/pokemones"))
-  .catch((err) => console.log(err));
+    await Pokemon.destroy({ where: { id } });
+    res.redirect("/pokemones");
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde."
+    });
+    console.log(err);
+  }
 };

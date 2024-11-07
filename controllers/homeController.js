@@ -48,6 +48,8 @@ exports.GetIndex = async (req, res) => {
         (pokemon) => pokemon.regionName === regionFilter
       );
     }
+
+    
     res.render("home", {
       pageTitle: "Home",
       pokemones: updatedPokemones,
@@ -56,11 +58,8 @@ exports.GetIndex = async (req, res) => {
     });
     return;
   } catch (error) {
-    res.render("home", {
-      pageTitle: "Error",
-      pokemones: [],
-      tipos: [],
-      regiones: [],
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde.",
     });
     console.log(error);
   }

@@ -1,17 +1,20 @@
 <div class ="card">
   <div class="card-body">
+    <div class ="d-flex justify-content-between align-items-center">
+      <h1 class="text-white">{{pageTitle}}</h1>
+      <h1 class="text-white">Total: {{pokemones.length}}</h1>
+    </div>
 
-<h1 class="text-white">{{pageTitle}}</h1>
-
-<div class="row mt-2 mb-2">
-  <div class="col-12 col-sm-4">
-    <a href="/pokemones/create" class="btn btn-info">
-    <i class="bi bi-plus-circle"></i> Agregar Pokemon
-    </a>
+    <div class="row mt-2 mb-2">
+      <div class="col-12 col-sm-4">
+        <a href="/pokemones/create" class="btn btn-info">
+          <i class="bi bi-plus-circle"></i> Agregar Pokemon
+        </a>
+      </div>
+    </div>
   </div>
 </div>
-</div>
-</div>
+
 <div class="row">
   {{#each pokemones}}
     <div class="col-6 col-sm-4 col-md-2"> 

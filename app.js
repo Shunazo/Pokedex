@@ -32,7 +32,6 @@ app.use("/", homeRoute);
 app.use("/pokemones", pokemonRoute);
 app.use("/regiones", regionRoute);
 app.use("/tipos", tipoRoute);
-
 app.use(errorController.Get404);
 
 Pokemon.associate({ Tipo, Region });
@@ -40,7 +39,7 @@ Region.associate({ Pokemon });
 Tipo.associate({ Pokemon });
 
 connection
-    .sync()
+    .sync({})
     .then((result) => {
         console.log(`App is running on port ${PORT}`)
         app.listen(PORT);

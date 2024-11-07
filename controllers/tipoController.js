@@ -1,61 +1,98 @@
 const Tipo = require("../models/tipo");
 
-exports.tipos = (req, res) => {
-  Tipo.findAll()
-    .then((tipos) => {
-      const tiposPlain = tipos.map((tipo) => tipo.get()); 
-      res.render("tipos/tipos", {
-        pageTitle: "Lista de Tipos",
-        tipos: tiposPlain,
-      });
-    })
-    .catch((err) => console.log(err));
+exports.tipos = async(req, res) => {
+  try{
+    const tipos = await Tipo.findAll();
+    
+    const tiposPlain = tipos.map(tipo => tipo.get());
+
+    res.render ("tipos/tipos", {
+      pageTitle: "Lista de Tipos",
+      tipos: tiposPlain,
+    });
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde.",
+    });
+    console.log(err);
+  }
 };
 
+
+//form de creacion
 exports.createForm = (req, res) => {
   res.render("tipos/tipos-create", {
     pageTitle: "Crear Tipo",
   });
 };
 
-exports.create = (req, res) => {
-  const { nombre } = req.body;
+//creacion en si
+exports.create = async(req, res) => {
+  try{
+    const { nombre } = req.body;
 
-  Tipo.create({ nombre })
-    .then(() => res.redirect("/tipos"))
-    .catch((err) => console.log(err));
+    await Tipo.create({ nombre });
+
+    res.redirect("/tipos");
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde.",
+    });
+    console.log(err);
+  }
 };
 
-exports.editForm = (req, res) => {
-  const id = req.params.id;
 
-  Tipo.findByPk(id)
-    .then((tipo) => {
-      if (!tipo) return res.redirect("/tipos");
+//form de edicion
+exports.editForm = async (req, res) => {
+  try{
+    const id = req.params.id;
+    const tipo = await Tipo.findByPk(id);
 
-      const tipoPlain = tipo.get();  
+    if (!tipo) return res.redirect("/tipos");
+    
+    const tipoPlain = tipo.get();
 
-      res.render("tipos/tipos-edit", {
-        pageTitle: "Editar Tipo",
-        tipo: tipoPlain,  
-      });
-    })
-    .catch((err) => console.log(err));
+    res.render("tipos/tipos-edit", {
+      pageTitle: "Editar Tipo",
+      tipo: tipoPlain,  
+    });
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde.",
+    });
+    console.log(err);
+  }
 };
 
-exports.edit = (req, res) => {
-  const id = req.params.id;
-  const { nombre } = req.body;
+//edicion en si
+exports.edit = async (req, res) => {
+  try{
+    const id = req.params.id;
+    const { nombre } = req.body;
 
-  Tipo.update({ nombre }, { where: { id } })
-    .then(() => res.redirect("/tipos"))
-    .catch((err) => console.log(err));
+    await Tipo.update({ nombre }, { where: { id } });
+
+    res.redirect("/tipos");
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde.",
+    });
+    console.log(err);
+  }
 };
 
-exports.delete = (req, res) => {
-  const id = req.params.id;
 
-  Tipo.destroy({ where: { id } })
-    .then(() => res.redirect("/tipos"))
-    .catch((err) => console.log(err));
+exports.delete = async (req, res) => {
+  try{
+    const id = req.params.id;
+
+    await Tipo.destroy({ where: { id } });
+    res.redirect("/tipos");
+  } catch (err) {
+    res.render("404", {
+      pageTitle: "Se produjo un error, vuelva al home o intente mas tarde.",
+    });
+    console.log(err);
+  }   
 };
